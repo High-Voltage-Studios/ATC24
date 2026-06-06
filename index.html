@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATC24 // MILITARY OPS REFERENCE</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#08090b;--panel:#0d0f12;--border:#162016;--green:#39ff14;--green-dim:#1a5e08;
+    --green-glow:rgba(57,255,20,0.1);--amber:#ffb300;--amber-dim:#5e4200;
+    --red:#ff3c3c;--red-dim:#5e1010;--text:#bff5b5;--muted:#3a5235;--muted2:#587a50;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;padding:16px;
+    background-image:
+      repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(57,255,20,0.02) 39px,rgba(57,255,20,0.02) 40px),
+      repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(57,255,20,0.02) 39px,rgba(57,255,20,0.02) 40px);}
+  .scanline{position:fixed;top:0;left:0;width:100%;height:100%;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);
+    pointer-events:none;z-index:9999;}
+  /* HEADER */
+  header{text-align:center;padding:20px 0 26px;border-bottom:1px solid var(--border);margin-bottom:22px;}
+  .header-tag{font-size:10px;color:var(--muted);letter-spacing:6px;margin-bottom:6px;}
+  h1{font-family:'Orbitron',monospace;font-size:clamp(16px,4vw,30px);font-weight:900;color:var(--green);
+    text-shadow:0 0 18px var(--green),0 0 40px rgba(57,255,20,0.2);letter-spacing:5px;}
+  .subtitle{font-size:10px;color:var(--muted2);letter-spacing:3px;margin-top:5px;}
+  /* TABS */
+  .tabs{display:flex;gap:3px;margin-bottom:20px;border-bottom:1px solid var(--border);overflow-x:auto;}
+  .tab{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;padding:9px 16px;
+    background:transparent;border:1px solid transparent;border-bottom:none;
+    color:var(--muted);cursor:pointer;transition:all .2s;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+  .tab:hover{color:var(--green);border-color:var(--green-dim);}
+  .tab.active{color:var(--green);background:var(--green-glow);border-color:var(--green-dim);border-bottom:1px solid var(--bg);margin-bottom:-1px;}
+  .panel{display:none;}.panel.active{display:block;}
+  /* SCRIPT BLOCKS */
+  .script-block{margin-bottom:18px;border:1px solid var(--border);}
+  .script-header{background:rgba(57,255,20,0.04);border-bottom:1px solid var(--border);
+    padding:9px 14px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2.5px;
+    color:var(--green-dim);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+  .badge{font-size:8px;padding:2px 8px;letter-spacing:1.5px;white-space:nowrap;border:1px solid;}
+  .badge.green{color:var(--green);border-color:var(--green-dim);}
+  .badge.amber{color:var(--amber);border-color:var(--amber-dim);}
+  .badge.red{color:var(--red);border-color:var(--red-dim);}
+  .script-body{padding:14px;}
+  .line{display:grid;grid-template-columns:76px 1fr;gap:10px;padding:7px 0;
+    border-bottom:1px solid rgba(22,32,22,0.7);align-items:start;}
+  .line:last-child{border-bottom:none;}
+  .speaker{font-size:9px;letter-spacing:1.5px;padding-top:2px;text-transform:uppercase;}
+  .speaker.pilot{color:var(--green);}
+  .speaker.atc{color:var(--amber);}
+  .speaker.note{color:var(--muted2);}
+  .speech{font-size:12px;line-height:1.75;color:var(--text);}
+  .speech em{color:var(--muted2);font-style:normal;font-size:10px;display:block;margin-top:3px;}
+  .divider{text-align:center;color:var(--muted);font-size:9px;letter-spacing:4px;margin:14px 0;}
+  .divider::before,.divider::after{content:'';display:inline-block;width:50px;height:1px;
+    background:var(--border);vertical-align:middle;margin:0 10px;}
+  /* TIPS */
+  .tip-card{border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
+  .tip-header{background:rgba(57,255,20,0.03);padding:10px 14px;font-family:'Orbitron',monospace;
+    font-size:9px;letter-spacing:2px;color:var(--green-dim);cursor:pointer;
+    display:flex;justify-content:space-between;user-select:none;transition:color .2s;}
+  .tip-header:hover{color:var(--green);}
+  .tip-toggle{color:var(--green-dim);font-size:12px;}
+  .tip-body{padding:14px;font-size:12px;line-height:1.85;color:var(--text);display:none;}
+  .tip-body.open{display:block;}
+  .tip-body ul{padding-left:14px;margin-top:4px;}
+  .tip-body li{margin-bottom:7px;}
+  .tip-body li::marker{color:var(--green-dim);}
+  .tip-body strong{color:var(--green);}
+  .tip-body .rule-tag{display:inline-block;font-size:9px;padding:1px 6px;border:1px solid var(--red-dim);
+    color:var(--red);letter-spacing:1px;margin-right:6px;vertical-align:middle;}
+  .tip-body .ok-tag{display:inline-block;font-size:9px;padding:1px 6px;border:1px solid var(--green-dim);
+    color:var(--green);letter-spacing:1px;margin-right:6px;vertical-align:middle;}
+  .icao-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px;}
+  .icao-table th{text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);
+    color:var(--green-dim);font-size:9px;letter-spacing:2px;}
+  .icao-table td{padding:5px 8px;border-bottom:1px solid rgba(22,32,22,0.5);color:var(--text);}
+  .icao-table tr:last-child td{border-bottom:none;}
+  .icao-table .icao-code{color:var(--amber);font-weight:bold;}
+  /* RESOURCES */
+  .section-label{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;
+    color:var(--green-dim);margin:18px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+  .site-card{display:flex;justify-content:space-between;align-items:center;
+    border:1px solid var(--border);padding:10px 14px;margin-bottom:8px;transition:border-color .2s;}
+  .site-card:hover{border-color:var(--green-dim);}
+  .site-name{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--green);}
+  .site-desc{font-size:10px;color:var(--muted2);margin-top:3px;}
+  .site-link{font-size:9px;color:var(--amber);text-decoration:none;letter-spacing:1px;
+    white-space:nowrap;padding-left:12px;flex-shrink:0;}
+  .site-link:hover{text-shadow:0 0 8px var(--amber);}
+  /* FLIGHT PLAN */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.form-grid{grid-template-columns:1fr;}}
+  .field{display:flex;flex-direction:column;gap:5px;}.field.full{grid-column:1/-1;}
+  label.field-label{font-size:9px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;}
+  input,select{background:var(--panel);border:1px solid var(--border);color:var(--text);
+    font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 11px;outline:none;
+    transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none;width:100%;}
+  input:focus,select:focus{border-color:var(--green-dim);box-shadow:0 0 8px var(--green-glow),inset 0 0 8px var(--green-glow);}
+  select option{background:#0d0f12;}
+  .radio-group{display:flex;}
+  .radio-group input[type="radio"]{display:none;}
+  .radio-group label{flex:1;text-align:center;padding:9px;border:1px solid var(--border);
+    cursor:pointer;font-size:12px;letter-spacing:2px;transition:all .2s;color:var(--muted2);}
+  .radio-group input[type="radio"]:checked+label{background:var(--green-glow);border-color:var(--green-dim);color:var(--green);text-shadow:0 0 8px var(--green);}
+  .output-box{background:#040604;border:1px solid var(--green-dim);padding:14px;font-size:12px;
+    line-height:1.6;color:var(--green);word-break:break-all;
+    box-shadow:inset 0 0 16px rgba(57,255,20,0.04);min-height:54px;margin-top:18px;position:relative;}
+  .output-label{position:absolute;top:-8px;left:10px;background:var(--bg);padding:0 6px;font-size:9px;letter-spacing:3px;color:var(--green-dim);}
+  .btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+  .fp-btn{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:1.5px;padding:10px 18px;
+    border:1px solid var(--green-dim);background:transparent;color:var(--green);
+    cursor:pointer;text-transform:uppercase;transition:all .2s;flex:1;min-width:100px;}
+  .fp-btn:hover{background:var(--green-glow);box-shadow:0 0 12px var(--green-glow);}
+  .fp-btn.red{border-color:var(--red-dim);color:var(--red);}
+  .fp-btn.red:hover{background:rgba(255,60,60,0.07);}
+  .fl-hint{font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:1px;}
+  .copied{color:var(--amber)!important;text-shadow:0 0 8px var(--amber);}
+  /* SAVED PLANS */
+  .saved-item{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+    padding:11px 13px;border:1px solid var(--border);margin-bottom:7px;transition:border-color .2s;}
+  .saved-item:hover{border-color:var(--green-dim);}
+  .saved-name{font-size:12px;color:var(--text);}
+  .saved-meta{font-size:10px;color:var(--muted2);margin-top:3px;line-height:1.5;}
+  .saved-btns{display:flex;gap:6px;flex-shrink:0;}
+  .saved-btns button{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px;
+    padding:6px 10px;border:1px solid var(--green-dim);background:transparent;
+    color:var(--green);cursor:pointer;transition:all .2s;white-space:nowrap;}
+  .saved-btns button:hover{background:var(--green-glow);}
+  .saved-btns button.red{border-color:var(--red-dim);color:var(--red);}
+  .saved-btns button.red:hover{background:rgba(255,60,60,0.07);}
+  .empty-msg{color:var(--muted);font-size:11px;letter-spacing:2px;padding:20px 0;text-align:center;}
+  /* MODAL */
+  .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);
+    z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
+  .modal-bg.open{display:flex;}
+  .modal{background:var(--panel);border:1px solid var(--green-dim);padding:20px;width:100%;max-width:420px;}
+  .modal h3{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;color:var(--green);margin-bottom:14px;}
+  .modal input{width:100%;margin-bottom:10px;}
+  .modal .hint{font-size:10px;color:var(--muted2);margin-bottom:12px;letter-spacing:1px;}
+  /* NOTAM */
+  .notam-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:560px){.notam-grid{grid-template-columns:1fr;}}
+  .notam-field{display:flex;flex-direction:column;gap:5px;}
+  .notam-field.full{grid-column:1/-1;}
+  .notam-label{font-size:9px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;}
+  .notam-input{background:var(--panel);border:1px solid var(--border);color:var(--text);
+    font-family:'Share Tech Mono',monospace;font-size:13px;padding:9px 11px;
+    outline:none;transition:border-color .2s;width:100%;}
+  .notam-input:focus{border-color:var(--green-dim);box-shadow:0 0 8px var(--green-glow);}
+  textarea.notam-input{resize:vertical;min-height:90px;line-height:1.6;}
+  .notam-saved-bar{font-size:9px;color:var(--muted2);letter-spacing:2px;margin-top:6px;min-height:14px;}
+  .notam-saved-bar.ok{color:var(--green);}
+  /* STATUS */
+  .status-bar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;
+    padding:8px 0;border-top:1px solid var(--border);margin-top:22px;
+    font-size:9px;color:var(--muted);letter-spacing:2px;}
+  .blink{animation:blink 1.2s step-end infinite;}
+  @keyframes blink{50%{opacity:0;}}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<header>
+  <div class="header-tag">ATC24 // PTFS // MILITARY OPS</div>
+  <h1>MILITARY OPS REFERENCE</h1>
+  <div class="subtitle">FLIGHT PLAN · RADIO SCRIPT · TIPS & RULES · ATC24 RESOURCES</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('fp',this)">▶ FLIGHT PLAN</button>
+  <button class="tab" onclick="switchTab('script',this)">▶ RADIO SCRIPT</button>
+  <button class="tab" onclick="switchTab('tips',this)">▶ TIPS & RULES</button>
+  <button class="tab" onclick="switchTab('icao',this)">▶ MILITARY ICAO</button>
+  <button class="tab" onclick="switchTab('resources',this)">▶ RESOURCES</button>
+  <button class="tab" onclick="switchTab('saved',this)">▶ SAVED PLANS</button>
+  <button class="tab" onclick="switchTab('notam',this)">▶ SESSION NOTES</button>
+</div>
+
+<!-- ═══════════════════════ FLIGHT PLAN ═══════════════════════ -->
+<div id="tab-fp" class="panel active">
+  <div class="form-grid">
+
+    <div class="field">
+      <label class="field-label">In-Game Display Name</label>
+      <input type="text" id="ingamecallsign" placeholder="e.g. viper 2020" oninput="generate()">
+    </div>
+
+    <div class="field">
+      <label class="field-label">ATC24 Callsign</label>
+      <input type="text" id="callsign" placeholder="e.g. axon 71" oninput="generate()">
+    </div>
+
+    <div class="field">
+      <label class="field-label">Aircraft (Select)</label>
+      <select id="ac-select" onchange="applyAircraft()">
+        <option value="">— Select Aircraft —</option>
+        <optgroup label="Modern Military">
+          <option>B-1 Lancer</option><option>B-2 Spirit</option><option>Eurofighter Typhoon</option>
+          <option>F-14 Tomcat</option><option>F-15E Strike Eagle</option><option>F-16 Fighting Falcon</option>
+          <option>F-22 Raptor</option><option>F-35B</option><option>F/A-18 Super Hornet</option>
+          <option>Hawk T1</option><option>Hawker Harrier</option><option>P-8 Poseidon</option>
+          <option>Saab JAS 39 Gripen</option><option>SR-71 Blackbird</option>
+          <option>Sukhoi Su-27</option><option>Sukhoi Su-57</option>
+        </optgroup>
+        <optgroup label="Old Military">
+          <option>Avro Vulcan</option><option>B-29 Superfortress</option><option>English Electric Lightning</option>
+          <option>F-4 Phantom</option><option>F4U Corsair</option><option>Fokker Dr.1</option>
+          <option>Hawker Hurricane</option><option>MiG-15</option><option>P-38 Lightning</option>
+          <option>P-51 Mustang</option><option>Wright Brothers Plane</option>
+        </optgroup>
+        <optgroup label="Cargo / Transport">
+          <option>Boeing C-17 Globemaster III</option><option>C-130 Hercules</option>
+        </optgroup>
+        <optgroup label="Helicopters">
+          <option>Airbus H135</option><option>Bell 412</option><option>Chinook</option>
+          <option>Sikorsky S-92</option><option>UH-60 Black Hawk</option>
+        </optgroup>
+        <optgroup label="Airliners">
+          <option>Airbus A320</option><option>Airbus A330</option><option>Airbus A340</option>
+          <option>Airbus A350</option><option>Airbus A380</option><option>ATR-72</option>
+          <option>Boeing 737</option><option>Boeing 747</option><option>Boeing 757</option>
+          <option>Boeing 767</option><option>Boeing 777</option><option>Boeing 787</option>
+          <option>Bombardier CRJ700</option><option>Concorde</option><option>Embraer E190</option>
+          <option>McDonnell Douglas DC-10</option><option>McDonnell Douglas MD-11</option>
+        </optgroup>
+        <optgroup label="Light Aircraft">
+          <option>Cessna 172</option><option>Cessna 182</option><option>Cessna Caravan</option>
+          <option>DHC-6 Twin Otter</option><option>Piper Cub</option><option>Piper PA-28</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Aircraft (Custom / Not Listed)</label>
+      <input type="text" id="aircraft" placeholder="Type if not in list above" oninput="generate()">
+    </div>
+
+    <div class="field">
+      <label class="field-label">Flight Rules</label>
+      <div class="radio-group">
+        <input type="radio" name="fr" id="ifr" value="IFR" onchange="generate()">
+        <label for="ifr">IFR</label>
+        <input type="radio" name="fr" id="vfr" value="VFR" checked onchange="generate()">
+        <label for="vfr">VFR</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Departing</label>
+      <select id="departing" onchange="generate()">
+        <option value="">— Select Airport —</option>
+        <optgroup label="Greater Rockford Island">
+          <option>Airbase Garry</option><option>Greater Rockford Airport</option><option>Mellor</option>
+          <option>Boltic Airfield</option><option>Waterloo</option><option>Training Centre</option>
+          <option>GR Road Base</option><option>Rockford Coast Guard Station</option>
+        </optgroup>
+        <optgroup label="Perth Island"><option>Perth International Airport</option><option>Lukla</option></optgroup>
+        <optgroup label="Orange Island"><option>Tokyo International Airport</option><option>Saba Airport</option></optgroup>
+        <optgroup label="Cyprus Island">
+          <option>Larnaca Airport</option><option>Barra Airport</option><option>Paphos Airport</option>
+          <option>Henstridge Airfield</option><option>McConnell AFB</option>
+        </optgroup>
+        <optgroup label="Izolirani Island">
+          <option>Izolirani Airport</option><option>Al Najaf Airfield</option>
+          <option>RAF Scampton</option><option>Izolirani Coast Guard</option>
+        </optgroup>
+        <optgroup label="Grindavik Island">
+          <option>Keflavik Airport</option><option>Pingeyri Airport</option><option>Grindavik Coast Guard</option>
+        </optgroup>
+        <optgroup label="Other">
+          <option>HMS Queen Elizabeth</option><option>Bird Island</option><option>Oil Rig</option>
+          <option>Abandoned Airfield</option><option>Guipo</option><option>Katcui</option>
+          <option>Orenji Coast Guard</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Arriving</label>
+      <select id="arriving" onchange="generate()">
+        <option value="">— Select Airport —</option>
+        <optgroup label="Greater Rockford Island">
+          <option>Airbase Garry</option><option>Greater Rockford Airport</option><option>Mellor</option>
+          <option>Boltic Airfield</option><option>Waterloo</option><option>Training Centre</option>
+          <option>GR Road Base</option><option>Rockford Coast Guard Station</option>
+        </optgroup>
+        <optgroup label="Perth Island"><option>Perth International Airport</option><option>Lukla</option></optgroup>
+        <optgroup label="Orange Island"><option>Tokyo International Airport</option><option>Saba Airport</option></optgroup>
+        <optgroup label="Cyprus Island">
+          <option>Larnaca Airport</option><option>Barra Airport</option><option>Paphos Airport</option>
+          <option>Henstridge Airfield</option><option>McConnell AFB</option>
+        </optgroup>
+        <optgroup label="Izolirani Island">
+          <option>Izolirani Airport</option><option>Al Najaf Airfield</option>
+          <option>RAF Scampton</option><option>Izolirani Coast Guard</option>
+        </optgroup>
+        <optgroup label="Grindavik Island">
+          <option>Keflavik Airport</option><option>Pingeyri Airport</option><option>Grindavik Coast Guard</option>
+        </optgroup>
+        <optgroup label="Other">
+          <option>HMS Queen Elizabeth</option><option>Bird Island</option><option>Oil Rig</option>
+          <option>Abandoned Airfield</option><option>Guipo</option><option>Katcui</option>
+          <option>Orenji Coast Guard</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field full">
+      <label class="field-label">Flight Level</label>
+      <input type="text" id="flightlevel" placeholder="050" maxlength="3" oninput="this.value=this.value.replace(/[^0-9]/g,'');generate()">
+      <div class="fl-hint">3 digits — 050 = 5,000ft &nbsp;|&nbsp; 180 = FL180 &nbsp;|&nbsp; 350 = FL350 &nbsp;|&nbsp; Military cruise typically FL300–FL450</div>
+    </div>
+
+  </div>
+
+  <div class="output-box">
+    <span class="output-label">GENERATED COMMAND</span>
+    <span id="fp-output">Fill in the fields above to generate your command.</span>
+  </div>
+
+  <div class="btn-row">
+    <button class="fp-btn" onclick="copyCommand()" id="copy-btn">⬛ COPY COMMAND</button>
+    <button class="fp-btn" onclick="openSaveModal()" style="border-color:var(--amber-dim);color:var(--amber);">💾 SAVE PLAN</button>
+    <button class="fp-btn red" onclick="clearForm()">↺ CLEAR</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ RADIO SCRIPT ═══════════════════════ -->
+<div id="tab-script" class="panel">
+
+  <div class="script-block">
+    <div class="script-header">PHASE 1 — PRE-FLIGHT: ATIS CHECK <span class="badge green">PREP</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech">Before anything — check #atis-information-1 in the ATC24 Discord. Write down the active runway, ATIS letter (e.g. "Information Bravo"), and any NOTAMs. File your /createflightplan command in #flight-plans before calling ground. Leave the squawk field blank — ATC assigns it in your clearance. For military ops, your "arriving" field can be your departure airport (circuit/local ops) or another military base. VFR is standard for local military ops; IFR if transiting to another island.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 2 — GROUND: IFR/VFR CLEARANCE <span class="badge green">GROUND</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Ground, [Callsign], [aircraft], information [ATIS letter], request [IFR/VFR] clearance, military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], Garry Ground, cleared [IFR/VFR], military operations approved. Expect runway [RWY]. Climb and maintain [alt], expect flight level [XXX] [X] minutes after departure. Squawk [code].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Cleared military operations, runway [RWY], climb and maintain [alt], squawking [code], [Callsign]. Ready to copy.</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>After receiving clearance — update your /createflightplan entry in #flight-plans with the squawk code ATC gave you. Don't push back until that's done.</em></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 3 — GROUND: PUSH, START & TAXI <span class="badge green">GROUND</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Ground, [Callsign], request push and start.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], push and start approved, face [direction].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Push and start approved, facing [direction], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Ground, [Callsign], ready to taxi, runway [RWY].</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], taxi to holding point [RWY] via [taxiway]. Hold short.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Taxi to holding point [RWY] via [taxiway], hold short, [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Ground speed limit on taxiways: 25 knots. On the ramp near hangars: 10 knots. These are ATC24 server rules.</em></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 4 — TOWER: TAKEOFF <span class="badge green">TOWER</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Tower, [Callsign], holding short runway [RWY], ready for departure, military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], runway [RWY], cleared for takeoff. Wind [X] at [X]. Fly runway heading.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Runway [RWY] cleared for takeoff, [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Requesting unrestricted climb (military jets) —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Tower, [Callsign], requesting unrestricted climb to flight level [XXX] for military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], unrestricted climb approved. Climb to flight level [XXX]. Report leaving [alt].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Unrestricted climb to flight level [XXX], [Callsign].</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 5 — DEPARTURE: AIRBORNE FREQ CHANGE <span class="badge amber">CLIMB-OUT</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Tower, [Callsign], airborne, passing [alt], request frequency change to center.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], frequency change approved. Contact Rockford Center [frequency]. Good day.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">[Frequency], good day, [Callsign].</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 6 — ROCKFORD CENTER: INITIAL CHECK-IN <span class="badge amber">EN ROUTE</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], [aircraft], level [altitude], military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], Rockford Center, radar contact. Proceed on course. Altimeter [setting].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Altimeter [setting], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Requesting a climb to cruise altitude —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], requesting climb to flight level [XXX], military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], climb and maintain flight level [XXX]. Report level.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Climb flight level [XXX], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech"><em>— Upon leveling off —</em>
+Rockford Center, [Callsign], level flight level [XXX].</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 7 — CENTER: VECTORS & OPS AREA <span class="badge amber">MILITARY OPS</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], requesting vectors [heading] for military operations area. We'll be maneuvering in the area.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], fly heading [XXX]. Advise when ops complete.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Heading [XXX], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Requesting block altitude for maneuvering —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], requesting block altitude between flight level [XXX] and flight level [XXX] for military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], block altitude flight level [XXX] through [XXX] approved. Advise when complete.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Block altitude [XXX] through [XXX], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>When operations are complete —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], military operations complete. Requesting [further vectors / RTB to Airbase Garry].</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 8 — FORMATION FLIGHT OPS <span class="badge amber">FORMATION</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Formation flights check in and operate as a single callsign. The lead aircraft handles all ATC comms. Both aircraft use the same squawk code.</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Ground, [Callsign], flight of two [aircraft type], information [ATIS letter], request VFR clearance, military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], flight of two approved. [Clearance as normal].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>En route check-in with formation —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], flight of two [aircraft], level [alt], military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>If your wingman needs to break off formation —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], wingman is departing the formation, now single ship.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], roger, single ship. [Wingman callsign], contact [frequency].</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 9 — VISUAL INVESTIGATION (PROXIMITY OPS) <span class="badge amber">VIS OPS</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>ATC24 rules do not permit hard intercepts of civilian traffic. If you want to fly near another aircraft, phrase it as a visual investigation or proximity pass — and only do it if the controller is okay with it and the server is quiet. Never cut off or disrupt a civilian in the pattern.</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], requesting visual investigation of traffic in our area. We have [traffic callsign/type] in sight at [position].</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], visual investigation approved. Maintain safe separation. Advise complete.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Visual investigation approved, [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>After completing the pass —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], visual investigation complete. Resuming military operations.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 10 — LOW PASS AT MILITARY BASE <span class="badge red">LOW PASS</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Tower, [Callsign], [distance] miles out, requesting low approach runway [RWY].</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], low approach runway [RWY] approved. Report 3-mile final. Wind [X] at [X].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">[Callsign], 3-mile final runway [RWY].</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], continue. Cleared low approach runway [RWY].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Cleared low approach [RWY], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>After the pass —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Tower, [Callsign], going around, climbing to [alt], request [full stop / another low pass].</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 11 — SECTOR HANDOFF (e.g. ST. BARTHOLOMEW CENTER) <span class="badge amber">HANDOFF</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], contact St. Bartholomew Center [frequency]. Good day.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">[Frequency], good day, [Callsign].</span>
+      </div>
+      <div class="divider">— NEW SECTOR —</div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">St. Bartholomew Center, [Callsign], [aircraft], level [altitude], military operations.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], St. Bartholomew Center, I have you at [alt]. Continue on course.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Continue on course, [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Always check in with aircraft type, current altitude, and "military operations" so the new controller has full situational awareness immediately.</em></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 12 — RTB: RETURN TO BASE <span class="badge green">RTB</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Rockford Center, [Callsign], military operations complete. Requesting vectors to Airbase Garry for full stop landing.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], fly heading [XXX], descend and maintain [alt]. Expect [visual] approach runway [RWY].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Heading [XXX], descending to [alt], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>On approach to Garry Tower —</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Tower, [Callsign], [distance] miles on visual final, runway [RWY], full stop.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], runway [RWY] cleared to land. Wind [X] at [X].</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Runway [RWY] cleared to land, [Callsign].</span>
+      </div>
+      <div class="divider">— AFTER LANDING —</div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry Tower, [Callsign], clear of runway [RWY].</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], taxi to [ramp/parking] via [taxiway]. Contact Ground [frequency]. Good day.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 13 — EMERGENCY PROCEDURES <span class="badge red">EMERGENCY</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Update your flight plan squawk to 7700 before transmitting. Controllers are watching squawk codes in ATC24.</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">MAYDAY MAYDAY MAYDAY. Rockford Center, [Callsign], [aircraft], declaring emergency. [Nature of emergency]. Requesting immediate vectors to nearest suitable airfield. Squawking 7700.</span>
+      </div>
+      <div class="line">
+        <span class="speaker atc">ATC</span>
+        <span class="speech">[Callsign], roger MAYDAY. Fly heading [XXX], descend and maintain [alt]. All traffic, standby.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Heading [XXX], descending [alt], [Callsign].</span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>Urgency (non-critical issue) — use PAN PAN instead: "PAN PAN PAN, Rockford Center, [Callsign], [issue], requesting priority handling."</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>NORDO (lost comms) — squawk 7600. Fly last assigned heading and altitude. ATC will attempt to light-gun signal or vector you using standard lost-comms procedures.</em></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">PHASE 14 — UNCONTROLLED AIRSPACE (UNICOM) <span class="badge green">UNICOM</span></div>
+    <div class="script-body">
+      <div class="line">
+        <span class="speaker note">NOTE</span>
+        <span class="speech"><em>When no ATC is active at an airport, that airport's voice channel becomes UNICOM. You broadcast your intentions for other pilots — no ATC clearance needed, but you still announce your moves.</em></span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry UNICOM, [Callsign], [aircraft], taxiing runway [RWY] for departure, military operations, Airbase Garry.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry UNICOM, [Callsign], taking the field runway [RWY], military departure, Airbase Garry.</span>
+      </div>
+      <div class="line">
+        <span class="speaker pilot">PILOT</span>
+        <span class="speech">Garry UNICOM, [Callsign], [distance] final runway [RWY], full stop, Airbase Garry.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════ TIPS & RULES ═══════════════════════ -->
+<div id="tab-tips" class="panel">
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ ATC24 SERVER RULES — WHAT YOU MUST KNOW <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li><span class="rule-tag">RULE</span>You must be verified with Bloxlink and wait 5 days after joining the ATC24 Discord before you can apply to fly on the server.</li>
+        <li><span class="rule-tag">RULE</span>You must have at least 60 minutes of PTFS flight time on your Roblox account to be accepted.</li>
+        <li><span class="rule-tag">RULE</span>Aircraft can only land at airports where they can also spawn. A military jet cannot land at a small civilian airfield that doesn't support it in-game.</li>
+        <li><span class="rule-tag">RULE</span>Use of flares is <strong>not permitted</strong> on ATC24 — this was specifically noted in the server's application questions.</li>
+        <li><span class="rule-tag">RULE</span>Hard intercepts of civilian traffic are not sanctioned. Coordinate proximity ops with the controller before executing.</li>
+        <li><span class="rule-tag">RULE</span>Speed limit below 10,000ft: 250 knots. Military jets may request exceptions from ATC for operational reasons.</li>
+        <li><span class="rule-tag">RULE</span>File your flight plan in #flight-plans before calling ground. Controllers expect the plan to already be posted.</li>
+        <li><span class="rule-tag">RULE</span>Leave the squawk field blank when filing — ATC assigns it in your clearance. Edit the plan to add it afterward.</li>
+        <li><span class="ok-tag">OK</span>You can fly without ATC clearance when no controller is active — use UNICOM procedures instead.</li>
+        <li><span class="ok-tag">OK</span>Military aircraft using VFR for local pattern work or ops area flights is normal and accepted.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ MILITARY FLIGHT PLAN TIPS <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li>For local ops (pattern work, low passes, ops area near Garry), depart <strong>VFR</strong> and list your arrival as Airbase Garry. No destination needed.</li>
+        <li>For cross-island transit to RAF Scampton or McConnell AFB, file <strong>IFR</strong> with the destination base's ICAO code.</li>
+        <li>Flight level for military jets: FL300–FL450 cruise. Use FL050–FL180 for low-level tactical work. Always state your FL in the plan.</li>
+        <li>Route field is optional — use "GPS DIRECT" or leave blank for direct ops.</li>
+        <li>Your in-game callsign and your ATC24 callsign are separate. The ATC24 callsign (e.g. "Axon 71") is what you use on comms. The in-game name (e.g. "Viper 2020") is just your display name in PTFS.</li>
+        <li>Formation flights: the flight lead files one plan for both aircraft. Wingmen don't file separately.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ MILITARY PHRASEOLOGY & RADIO DISCIPLINE <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li><strong>Always end with your callsign.</strong> "Climb flight level 350, Axon Seven One." Never leave a transmission unidentified.</li>
+        <li>Read back every clearance exactly — altitude, heading, squawk, runway. Don't summarize or paraphrase ATC instructions.</li>
+        <li><strong>Wilco</strong> = will comply. Use when you've already heard the instruction and don't need to repeat it all back.</li>
+        <li><strong>Roger</strong> = received only. Doesn't mean you'll comply. Use sparingly.</li>
+        <li><strong>Negative / Affirmative</strong> — not "no" or "yes" on frequency.</li>
+        <li>Numbers: FL350 = "Flight level three five zero." Heading 270 = "heading two seven zero." Squawk 4521 = "four five two one."</li>
+        <li>If you miss a clearance: "[Callsign], say again." Short and clean.</li>
+        <li>Don't use the word "intercept" over radio. Use "visual investigation" or "proximity pass" or "military operations in vicinity of [traffic/area]."</li>
+        <li>Keep transmissions short. No filler words. Dead air after you release the PTT is fine.</li>
+        <li>If your intent changes mid-flight, advise center immediately: "[Callsign], amending routing, requesting [new intent]."</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ BLOCK ALTITUDE & OPS AREA TACTICS <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li>A <strong>block altitude</strong> gives you a vertical range (e.g. FL250–FL350) to maneuver freely without reporting every altitude change. Request it when you'll be doing hard turns, climbs, and dives in the same area.</li>
+        <li>Request block altitude before entering the ops area, not after you're already maneuvering.</li>
+        <li>Typical military block altitude range: 5,000–10,000ft of vertical spread. Wider than that may get denied depending on traffic.</li>
+        <li>When your ops are complete, <strong>always advise center</strong> — controllers are holding traffic for your block. Don't leave them hanging.</li>
+        <li>If you're doing low-level work below FL180, advise center of your lowest intended altitude so they can ensure separation from civilian traffic above you.</li>
+        <li>For supersonic runs (SR-71, F-22 at full mil): advise ATC before accelerating past 600 knots and give a general ops area position.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ AIRBASE GARRY — FIELD GUIDE <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li>Military-only airbase on Greater Rockford Island. Spawns modern and old military aircraft. <strong>No airliners or cargo planes.</strong></li>
+        <li>Short runway — avoid attempting to land very large aircraft (AN-225, B747). P-8 Poseidon fits due to base size.</li>
+        <li>Only fuel tank is on the far side of the ramp, away from the hangars. Plan fuel stops accordingly.</li>
+        <li>The barracks has a canteen, briefing room, and a room for pre-mission RP setup.</li>
+        <li>From the tower you can see Mellor Airport and the Forth Bridge in the distance — useful for visual nav reference.</li>
+        <li>The airbase sits next to the coast and a mountain — expect tight approach angles on certain runway headings. Fly the chart.</li>
+        <li>If ATC is active at Garry, you're in controlled airspace from engine start. If not, use UNICOM procedures.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ OTHER MILITARY BASES IN PTFS <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li><strong>RAF Scampton</strong> — on Scampton Island off Izolirani. Military jets supposed to land here rather than Izolirani Airport. Connected to South Izolirani by a single bridge. Good for long-range ops from Garry.</li>
+        <li><strong>McConnell AFB</strong> — on Cyprus Island. One of four military-only spawn airports. Cross-island transit from Garry makes for a solid long IFR mission.</li>
+        <li><strong>HMS Queen Elizabeth</strong> — aircraft carrier. F-35B VTOL and carrier-capable aircraft are the appropriate choice here. Short deck ops only.</li>
+        <li><strong>GR Road Base</strong> — small road base on Greater Rockford Island. Suitable for light military or rotary ops.</li>
+        <li>Military aircraft should land at a military base wherever available rather than using civilian airports, per ATC24 realism standards.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ SQUAWK CODES ON ATC24 <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li>Leave squawk blank when filing your flight plan. ATC assigns a random 4-digit code (digits 0–7 only) in your IFR/VFR clearance.</li>
+        <li>Edit your flight plan in #flight-plans to add the assigned squawk before pushing back.</li>
+        <li><strong>7700</strong> — Emergency (MAYDAY / PAN PAN). Update your plan squawk to this immediately when declaring.</li>
+        <li><strong>7600</strong> — Two-way radio failure (NORDO). Fly last assigned heading and altitude. ATC will work around you.</li>
+        <li><strong>7500</strong> — Air piracy / hostile acts. <strong>Never use this casually on ATC24.</strong> It will trigger an immediate server response.</li>
+        <li>Squawk codes on ATC24 are RP only — there's no actual transponder hardware — but controllers still track them via your flight plan for realism and coordination.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tip-card">
+    <div class="tip-header" onclick="toggleTip(this)">▶ ATIS & CHANNEL STRUCTURE IN ATC24 DISCORD <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li>Check <strong>#atis-information-1</strong> before every flight. It gives you the active runway, winds, altimeter, and any NOTAMs. Note the information letter — you'll say it when calling ground: "Information Bravo."</li>
+        <li>File your plan in <strong>#flight-plans</strong>. Format: <code>/createflightplan ingamecallsign: callsign: aircraft: flightrules: departing: arriving: flightlevel:</code></li>
+        <li>Voice rooms are labeled by position — e.g. <strong>IRFD_GND</strong> = Rockford Ground, <strong>IRFD_TWR</strong> = Rockford Tower, <strong>IRFD_CTR</strong> = Rockford Center. You switch VC rooms when ATC hands you off to the next frequency.</li>
+        <li>When you spawn at Airbase Garry, your ground voice room is the Garry Ground VC.</li>
+        <li>Charts for all airports (ground charts, taxiway diagrams) are in <strong>#atc-24-charts</strong>.</li>
+        <li>The ATC24 server application requires correct answers to 11 questions — common ones include knowing that the 250kt limit is below 10,000ft, that flares are not permitted, and that an F/A-18 can land at Airbase Garry, McConnell AFB, or RAF Scampton.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════ MILITARY ICAO CODES ═══════════════════════ -->
+<div id="tab-icao" class="panel">
+
+  <div class="tip-card" style="margin-bottom:14px;">
+    <div class="tip-header" onclick="toggleTip(this)">▶ HOW ICAO CODES WORK ON ATC24 <span class="tip-toggle">+</span></div>
+    <div class="tip-body">
+      <ul>
+        <li>ICAO codes are the 4-letter airport identifiers used in <strong>flight plans only</strong>. On ATC24, you use the full airport name or ICAO in #flight-plans.</li>
+        <li>On the radio, use the <strong>full name</strong> — say "Airbase Garry" not "IGRY." ICAO codes are filing tools, not verbal callsigns.</li>
+        <li>ICAO codes can be found on the in-game ground charts, the official PTFS charts site, and in the #atc-24-charts Discord channel.</li>
+        <li>Greater Rockford Airport = <strong>IRFD</strong>. All PTFS codes start with "I" — they are fictional but follow the format of real ICAO codes.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">MILITARY & TACTICAL AIRPORTS</div>
+  <table class="icao-table">
+    <tr><th>AIRPORT</th><th>ICAO</th><th>ISLAND</th><th>NOTES</th></tr>
+    <tr><td>Airbase Garry</td><td class="icao-code">IGRY</td><td>Greater Rockford</td><td>Primary military base, short runway, F-22/F-16/Su-27 ops</td></tr>
+    <tr><td>McConnell AFB</td><td class="icao-code">IMCN</td><td>Cyprus Island</td><td>Military-only spawn, long cross-island transit target</td></tr>
+    <tr><td>RAF Scampton</td><td class="icao-code">IRSC</td><td>Scampton Island</td><td>Military-only spawn, off Izolirani, bridge access only</td></tr>
+    <tr><td>HMS Queen Elizabeth</td><td class="icao-code">IHMS</td><td>Mobile / Sea</td><td>Carrier ops, F-35B VTOL primary, short deck</td></tr>
+    <tr><td>GR Road Base</td><td class="icao-code">IGRB</td><td>Greater Rockford</td><td>Light military / rotary, road strip</td></tr>
+    <tr><td>Al Najaf Airfield</td><td class="icao-code">IANJ</td><td>Izolirani Island</td><td>Small coastal strip, overshoots = ocean ditch</td></tr>
+  </table>
+
+  <div class="section-label">MAJOR CIVILIAN AIRPORTS (REFERENCE)</div>
+  <table class="icao-table">
+    <tr><th>AIRPORT</th><th>ICAO</th><th>ISLAND</th><th>NOTES</th></tr>
+    <tr><td>Greater Rockford Airport</td><td class="icao-code">IRFD</td><td>Greater Rockford</td><td>Busiest airport in PTFS, all aircraft</td></tr>
+    <tr><td>Perth International</td><td class="icao-code">IPPH</td><td>Perth Island</td><td>Major international, all aircraft</td></tr>
+    <tr><td>Larnaca Airport</td><td class="icao-code">ILCA</td><td>Cyprus Island</td><td>Major international, all aircraft</td></tr>
+    <tr><td>Tokyo International</td><td class="icao-code">ITKO</td><td>Orange Island</td><td>Major international, all aircraft</td></tr>
+    <tr><td>Keflavik Airport</td><td class="icao-code">IKEF</td><td>Grindavik Island</td><td>Regional international</td></tr>
+    <tr><td>Izolirani Airport</td><td class="icao-code">IIZL</td><td>Izolirani Island</td><td>Long-haul destination, civilian preferred</td></tr>
+    <tr><td>Mellor</td><td class="icao-code">IMEL</td><td>Greater Rockford</td><td>Regional, mid-size aircraft</td></tr>
+  </table>
+
+  <div class="section-label">SMALL AIRFIELDS (LIGHT AIRCRAFT / ROTARY)</div>
+  <table class="icao-table">
+    <tr><th>AIRPORT</th><th>ICAO</th><th>NOTES</th></tr>
+    <tr><td>Boltic Airfield</td><td class="icao-code">IBLT</td><td>Greater Rockford, light aircraft only</td></tr>
+    <tr><td>Waterloo</td><td class="icao-code">IWAT</td><td>Greater Rockford, small strip</td></tr>
+    <tr><td>Henstridge Airfield</td><td class="icao-code">IHEN</td><td>Cyprus Island, light aircraft</td></tr>
+    <tr><td>Lukla</td><td class="icao-code">ILUK</td><td>Perth Island, short/steep approach</td></tr>
+    <tr><td>Pingeyri Airport</td><td class="icao-code">IPIN</td><td>Grindavik Island, small regional</td></tr>
+  </table>
+
+  <div style="font-size:10px;color:var(--muted2);margin-top:14px;line-height:1.8;letter-spacing:1px;">
+    NOTE: Some ICAO codes above are based on in-game chart references and community documentation. Confirm exact codes against the in-game charts or #atc-24-charts on Discord before filing — codes are set by the ATC24 team and may update.
+  </div>
+
+</div>
+
+<!-- ═══════════════════════ RESOURCES ═══════════════════════ -->
+<div id="tab-resources" class="panel">
+
+  <div class="section-label">ATC24 OFFICIAL</div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">ATC24 DISCORD SERVER</div>
+      <div class="site-desc">File flight plans, get clearances, access ATIS, charts, and server rules — the main hub for everything ATC24</div>
+    </div>
+    <a class="site-link" href="https://discord.gg/atc24" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">PTC DISCORD (PARENT SERVER)</div>
+      <div class="site-desc">Pilot Training Club — the parent community for ATC24, additional guides and community resources</div>
+    </div>
+    <a class="site-link" href="https://discord.gg/ptc" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">ATC24 WIKI PAGE (PTFS FANDOM)</div>
+      <div class="site-desc">Official ATC24 rules, airline callsign table, server tools, and application info — start here if you're new</div>
+    </div>
+    <a class="site-link" href="https://roblox-ptfs.fandom.com/wiki/ATC_24" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">ATC24 GUIDE (PTFS FANDOM)</div>
+      <div class="site-desc">Full procedural guide — ICAO codes, IFR/VFR procedures, squawk codes, flight plan format, phraseology</div>
+    </div>
+    <a class="site-link" href="https://roblox-ptfs.fandom.com/wiki/ATC_24/Guide" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="section-label">CHARTS & NAVIGATION TOOLS</div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">PTFS OFFICIAL CHARTS</div>
+      <div class="site-desc">Official ground charts for every PTFS airport — taxiways, gates, runways, holding points</div>
+    </div>
+    <a class="site-link" href="https://ptfs.app/charts" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">PTFS APP (MAIN)</div>
+      <div class="site-desc">Main PTFS companion site — charts, airport info, and community resources</div>
+    </div>
+    <a class="site-link" href="https://ptfs.app" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">INTERACTIVE PTFS/ATC24 CHART MAP</div>
+      <div class="site-desc">Interactive tool by user_NULL — navigate enroute and ground charts for all airports without switching tabs. Built for ATC24 controllers and pilots</div>
+    </div>
+    <a class="site-link" href="https://gamejolt.com/games/ptfs-atc24-chart/694690" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="section-label">CONTROLLER TOOLS (ATC24 SPECIFIC)</div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">PTFS FLIGHTSTRIP</div>
+      <div class="site-desc">Online tool by tama1978 — lets controllers create flight strips with built-in randomized squawk and ATIS generator. ATC24-specific</div>
+    </div>
+    <a class="site-link" href="https://ptfs.app" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">ATC24 SUITE</div>
+      <div class="site-desc">One-stop controller hub — flight strip system, automated flight plan uploader, ground chart integration, multi-session ATC sharing</div>
+    </div>
+    <a class="site-link" href="https://ptfs.app" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">INTERACTIVE WAYPOINT MAP</div>
+      <div class="site-desc">Tool by p1anes — controllers plot headings for vectoring aircraft on a PTFS waypoint map by dragging lines. Useful for military vectoring ops</div>
+    </div>
+    <a class="site-link" href="https://ptfs.app" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="section-label">PTFS COMMUNITY REFERENCE</div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">PTFS FANDOM WIKI</div>
+      <div class="site-desc">Aircraft pages, airport details, military base info, liveries — comprehensive community wiki</div>
+    </div>
+    <a class="site-link" href="https://roblox-ptfs.fandom.com" target="_blank">OPEN →</a>
+  </div>
+
+  <div class="site-card">
+    <div>
+      <div class="site-name">FAA PHRASEOLOGY CHEAT SHEET</div>
+      <div class="site-desc">Community resource by bippityipsnipp — officially linked in ATC24 resources. Covers FAA-standard phraseology used on the server</div>
+    </div>
+    <a class="site-link" href="https://roblox-ptfs.fandom.com/wiki/ATC_24" target="_blank">OPEN →</a>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════ SAVED PLANS ═══════════════════════ -->
+<div id="tab-saved" class="panel">
+  <div id="saved-list"></div>
+  <div class="btn-row" style="margin-top:4px;">
+    <button class="fp-btn" onclick="renderSaved()">↺ REFRESH</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SESSION NOTES / NOTAM ═══════════════════════ -->
+<div id="tab-notam" class="panel">
+  <div class="notam-grid">
+    <div class="notam-field">
+      <label class="notam-label">ATIS Letter</label>
+      <input class="notam-input" type="text" id="n-atis" maxlength="1" placeholder="e.g. B" oninput="saveNotam()">
+    </div>
+    <div class="notam-field">
+      <label class="notam-label">Active Runway</label>
+      <input class="notam-input" type="text" id="n-rwy" maxlength="6" placeholder="e.g. 09 / 27L" oninput="saveNotam()">
+    </div>
+    <div class="notam-field">
+      <label class="notam-label">Wind</label>
+      <input class="notam-input" type="text" id="n-wind" placeholder="e.g. 090 at 8" oninput="saveNotam()">
+    </div>
+    <div class="notam-field">
+      <label class="notam-label">Altimeter</label>
+      <input class="notam-input" type="text" id="n-alt" placeholder="e.g. 29.92" oninput="saveNotam()">
+    </div>
+    <div class="notam-field">
+      <label class="notam-label">Squawk Assigned</label>
+      <input class="notam-input" type="text" id="n-squawk" maxlength="4" placeholder="e.g. 4521" oninput="saveNotam()">
+    </div>
+    <div class="notam-field">
+      <label class="notam-label">Departure Freq</label>
+      <input class="notam-input" type="text" id="n-dep-freq" placeholder="e.g. 124.8" oninput="saveNotam()">
+    </div>
+    <div class="notam-field full">
+      <label class="notam-label">NOTAMs / Special Instructions</label>
+      <textarea class="notam-input" id="n-notam" placeholder="e.g. Runway 09 closed. Use 27. No pattern work above FL050 due to military ops..." oninput="saveNotam()"></textarea>
+    </div>
+    <div class="notam-field full">
+      <label class="notam-label">Session Notes (Free Text)</label>
+      <textarea class="notam-input" id="n-notes" style="min-height:110px;" placeholder="Anything you want to remember for this session — ATC names, vectors assigned, mission notes..." oninput="saveNotam()"></textarea>
+    </div>
+  </div>
+  <div class="notam-saved-bar" id="notam-status"></div>
+  <div class="btn-row" style="margin-top:10px;">
+    <button class="fp-btn" onclick="clearNotam()">↺ CLEAR SESSION</button>
+  </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div class="modal-bg" id="save-modal" onclick="if(event.target===this)closeSaveModal()">
+  <div class="modal">
+    <h3>SAVE FLIGHT PLAN</h3>
+    <div class="hint" id="modal-suggestion"></div>
+    <input type="text" id="plan-name" placeholder="Plan name..." maxlength="50" class="notam-input" style="margin-bottom:12px;">
+    <div class="btn-row">
+      <button class="fp-btn" onclick="confirmSave()">SAVE</button>
+      <button class="fp-btn red" onclick="closeSaveModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span>ATC24 // MILITARY OPS REFERENCE</span>
+  <span class="blink">■</span>
+  <span>PTFS // v3.0</span>
+</div>
+
+<script>
+  // ── Flight Plan ──
+  function applyAircraft() {
+    const v = document.getElementById('ac-select').value;
+    if(v) { document.getElementById('aircraft').value = v; generate(); }
+  }
+  function getFR() { const r = document.querySelector('input[name="fr"]:checked'); return r ? r.value : 'VFR'; }
+  function padFL(fl) { return fl ? fl.padStart(3,'0') : ''; }
+  function generate() {
+    const igs = document.getElementById('ingamecallsign').value.trim();
+    const cs  = document.getElementById('callsign').value.trim();
+    const ac  = document.getElementById('aircraft').value.trim();
+    const fr  = getFR();
+    const dep = document.getElementById('departing').value;
+    const arr = document.getElementById('arriving').value;
+    const fl  = padFL(document.getElementById('flightlevel').value.trim());
+    if(!igs && !cs && !ac && !dep && !arr && !fl) {
+      document.getElementById('fp-output').textContent = 'Fill in the fields above to generate your command.';
+      return;
+    }
+    let cmd = '/createflightplan';
+    if(igs) cmd += ` ingamecallsign:${igs}`;
+    if(cs)  cmd += ` callsign:${cs}`;
+    if(ac)  cmd += ` aircraft:${ac}`;
+    cmd += ` flightrules:${fr}`;
+    if(dep) cmd += ` departing:${dep}`;
+    if(arr) cmd += ` arriving:${arr}`;
+    if(fl)  cmd += ` flightlevel:${fl}`;
+    document.getElementById('fp-output').textContent = cmd;
+    document.getElementById('fp-output').classList.remove('copied');
+  }
+  function copyCommand() {
+    const text = document.getElementById('fp-output').textContent;
+    if(!text || text.startsWith('Fill in')) return;
+    navigator.clipboard.writeText(text).then(() => {
+      document.getElementById('fp-output').classList.add('copied');
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = '✓ COPIED';
+      setTimeout(() => { btn.textContent = '⬛ COPY COMMAND'; document.getElementById('fp-output').classList.remove('copied'); }, 2000);
+    });
+  }
+  function clearForm() {
+    ['ingamecallsign','callsign','aircraft','flightlevel'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('ac-select').value = '';
+    document.getElementById('departing').value = '';
+    document.getElementById('arriving').value = '';
+    document.getElementById('vfr').checked = true;
+    generate();
+  }
+  // ── Tab / Tips ──
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    if(btn) btn.classList.add('active');
+    if(tab === 'saved') renderSaved();
+    if(tab === 'notam') loadNotam();
+  }
+
+  // ── Save / Load ──
+  function getPlans() { try { return JSON.parse(localStorage.getItem('atc24_mil_plans') || '[]'); } catch(e) { return []; } }
+  function setPlans(p) { localStorage.setItem('atc24_mil_plans', JSON.stringify(p)); }
+
+  function autoName() {
+    const dep = document.getElementById('departing').value;
+    const arr = document.getElementById('arriving').value;
+    const ac  = document.getElementById('aircraft').value.trim();
+    const cs  = document.getElementById('callsign').value.trim();
+    let parts = [];
+    if(dep) parts.push(dep.replace(' Airport','').replace(' Airfield','').replace(' AFB','').replace(' International',''));
+    if(arr && arr !== dep) parts.push(arr.replace(' Airport','').replace(' Airfield','').replace(' AFB','').replace(' International',''));
+    if(ac)  parts.push(ac);
+    if(cs)  parts.push(cs.toUpperCase());
+    return parts.join(' → ');
+  }
+
+  function getCurrentData() {
+    return {
+      ingamecallsign: document.getElementById('ingamecallsign').value.trim(),
+      callsign:       document.getElementById('callsign').value.trim(),
+      aircraft:       document.getElementById('aircraft').value.trim(),
+      flightrules:    getFR(),
+      departing:      document.getElementById('departing').value,
+      arriving:       document.getElementById('arriving').value,
+      flightlevel:    padFL(document.getElementById('flightlevel').value.trim()),
+      command:        document.getElementById('fp-output').textContent
+    };
+  }
+
+  function openSaveModal() {
+    const cmd = document.getElementById('fp-output').textContent;
+    if(!cmd || cmd.startsWith('Fill in')) { alert('Fill in your flight plan first.'); return; }
+    const suggestion = autoName();
+    document.getElementById('modal-suggestion').textContent = suggestion ? 'Suggested: ' + suggestion : '';
+    document.getElementById('plan-name').value = suggestion;
+    document.getElementById('save-modal').classList.add('open');
+    document.getElementById('plan-name').focus();
+    document.getElementById('plan-name').select();
+  }
+  function closeSaveModal() { document.getElementById('save-modal').classList.remove('open'); }
+
+  function confirmSave() {
+    const name = document.getElementById('plan-name').value.trim() || autoName() || 'Unnamed Plan';
+    const plans = getPlans();
+    plans.unshift({ id: Date.now(), name, date: new Date().toLocaleDateString(), data: getCurrentData() });
+    setPlans(plans);
+    closeSaveModal();
+    document.getElementById('plan-name').value = '';
+  }
+
+  function loadPlan(id) {
+    const plan = getPlans().find(p => p.id === id);
+    if(!plan) return;
+    const d = plan.data;
+    document.getElementById('ingamecallsign').value = d.ingamecallsign || '';
+    document.getElementById('callsign').value       = d.callsign || '';
+    document.getElementById('aircraft').value       = d.aircraft || '';
+    document.getElementById('flightlevel').value    = d.flightlevel || '';
+    document.getElementById('departing').value      = d.departing || '';
+    document.getElementById('arriving').value       = d.arriving || '';
+    if(d.flightrules === 'IFR') document.getElementById('ifr').checked = true;
+    else document.getElementById('vfr').checked = true;
+    generate();
+    // Switch to flight plan tab
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-fp').classList.add('active');
+    document.querySelectorAll('.tab')[0].classList.add('active');
+  }
+
+  function deletePlan(id) {
+    if(!confirm('Delete this saved plan?')) return;
+    setPlans(getPlans().filter(p => p.id !== id));
+    renderSaved();
+  }
+
+  function renderSaved() {
+    const plans = getPlans();
+    const el = document.getElementById('saved-list');
+    if(!plans.length) { el.innerHTML = '<div class="empty-msg">NO SAVED PLANS YET — SAVE ONE FROM THE FLIGHT PLAN TAB</div>'; return; }
+    el.innerHTML = plans.map(p => `
+      <div class="saved-item">
+        <div>
+          <div class="saved-name">${p.name}</div>
+          <div class="saved-meta">
+            ${p.data.departing||'?'} → ${p.data.arriving||'?'} &nbsp;|&nbsp;
+            ${p.data.aircraft||'?'} &nbsp;|&nbsp;
+            ${p.data.flightrules} FL${p.data.flightlevel||'?'} &nbsp;|&nbsp;
+            ${p.data.callsign||'—'} &nbsp;|&nbsp; ${p.date}
+          </div>
+        </div>
+        <div class="saved-btns">
+          <button onclick="loadPlan(${p.id})">LOAD</button>
+          <button class="red" onclick="deletePlan(${p.id})">DEL</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── NOTAM / Session Notes ──
+  const NOTAM_FIELDS = ['n-atis','n-rwy','n-wind','n-alt','n-squawk','n-dep-freq','n-notam','n-notes'];
+  function saveNotam() {
+    const data = {};
+    NOTAM_FIELDS.forEach(id => { data[id] = document.getElementById(id).value; });
+    localStorage.setItem('atc24_notam', JSON.stringify(data));
+    const bar = document.getElementById('notam-status');
+    bar.textContent = '✓ SESSION NOTES SAVED';
+    bar.classList.add('ok');
+    setTimeout(() => { bar.textContent = ''; bar.classList.remove('ok'); }, 1800);
+  }
+  function loadNotam() {
+    try {
+      const data = JSON.parse(localStorage.getItem('atc24_notam') || '{}');
+      NOTAM_FIELDS.forEach(id => { if(data[id] !== undefined) document.getElementById(id).value = data[id]; });
+    } catch(e) {}
+  }
+  function clearNotam() {
+    if(!confirm('Clear all session notes?')) return;
+    NOTAM_FIELDS.forEach(id => { document.getElementById(id).value = ''; });
+    localStorage.removeItem('atc24_notam');
+  }
+
+  // ── Init ──
+  generate();
+  loadNotam();
+
+  function toggleTip(header) {
+    const body = header.nextElementSibling;
+    const tog = header.querySelector('.tip-toggle');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    if(tog) tog.textContent = isOpen ? '+' : '−';
+  }
+</script>
+</body>
+</html>
